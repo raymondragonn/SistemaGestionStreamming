@@ -29,7 +29,9 @@ void mergeSort(int left, int right, Nodo **array);
 void ordenaPorGenero(Nodo **Catalogo);
 Nodo** listaEnArreglo(Nodo* Lista, int* n);
 void reconstruirListaDesdeArreglo(Nodo** Lista, Nodo** arreglo, int n);
-void quickSortPorCalif(Nodo** arr, int low, int high);
+void swap(Nodo **a, Nodo **b);
+int partition(Nodo** arr, int low, int high);
+void quickSort(Nodo **arr, int low, int high);
 void topPopulares(Nodo** Catalogo);
 void ordenaPorCalif(Nodo **Catalogo);
 void xPeliculasEnXTiempo(Nodo **Catalogo, int time);
@@ -414,29 +416,33 @@ void reconstruirListaDesdeArreglo(Nodo** Lista, Nodo** arreglo, int n) {
     temp->sgt = NULL;
 }
 
-// Función corregida de QuickSort
-void quickSortPorCalif(Nodo** arr, int low, int high) {
-    if (low < high) {
-        int pivot = arr[high]->pelicula.calif;
-        int i = low - 1;
+void swap(Nodo **a, Nodo **b) {
+    Nodo *temp = *a;
+    *a = *b;
+    *b = temp;
+}
 
-        for (int j = low; j < high; j++) {
-            if (arr[j]->pelicula.calif > pivot) { // Orden descendente
-                i++;
-                Nodo* temp = arr[i];
-                arr[i] = arr[j];
-                arr[j] = temp;
-            }
+int partition(Nodo** arr, int low, int high) {
+    int pivot = arr[high]->pelicula.calif; // El pivote es la calificación del último elemento
+    int i = low - 1;
+
+    for (int j = low; j < high; j++) {
+        if (arr[j]->pelicula.calif > pivot) { // Orden descendente
+            i++;
+            swap(&arr[i], &arr[j]);
         }
+    }
 
-        Nodo* temp = arr[i + 1];
-        arr[i + 1] = arr[high];
-        arr[high] = temp;
+    swap(&arr[i + 1], &arr[high]); // Coloca el pivote en la posición correcta
+    return i + 1;
+}
 
-        int pi = i + 1;
+void quickSort(Nodo **arr, int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high); // Obtiene el índice del pivote
 
-        quickSortPorCalif(arr, low, pi - 1);
-        quickSortPorCalif(arr, pi + 1, high);
+        quickSort(arr, low, pi - 1);  // Ordena la sublista izquierda
+        quickSort(arr, pi + 1, high); // Ordena la sublista derecha
     }
 }
 
@@ -451,7 +457,7 @@ void topPopulares(Nodo** Catalogo) {
     int n = 0;
     Nodo** arreglo = listaEnArreglo(*Catalogo, &n);
 
-    quickSortPorCalif(arreglo, 0, n - 1);
+    quickSort(arreglo, 0, n - 1);
 
     puts("- - - - - - - - - - - - - - -");
     puts("TOP 10 POPULARES");
