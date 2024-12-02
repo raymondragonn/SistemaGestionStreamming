@@ -32,6 +32,9 @@ void reconstruirListaDesdeArreglo(Nodo** Lista, Nodo** arreglo, int n);
 void quickSortPorCalif(Nodo** arr, int low, int high);
 void topPopulares(Nodo** Catalogo);
 void ordenaPorCalif(Nodo **Catalogo);
+void xPeliculasEnXTiempo(Nodo **Catalogo, int time);
+int stringMatching(char *t,char *p);
+void buscarTitulo(Nodo **Catalogo, char *keyWord);
 void verUnaPelicula(Nodo **Catalogo, Nodo **Historial);
 void eliminarPrimera(Nodo **Historial);
 void imprimirPrimera(Nodo *Historial);
@@ -117,8 +120,22 @@ void menu(Nodo **Catalogo, Nodo **Historial)
                 ordenaPorCalif(Catalogo);
                 break;
             case 'D':
+                system("cls");
+                int time;
+                puts("- - - - - - - - - - - - - - -");
+                puts("X PELICULAS EN X TIEMPO");
+                puts("Te diremos cuantas peliculas podrias ver en un tiempo dado.\nIntroduce el tiempo en minutos: ");
+                scanf(" %d", &time);
+                xPeliculasEnXTiempo(Catalogo,time);
                 break;
             case 'E':
+                system("cls");
+                char keyWord[100];
+                puts("- - - - - - - - - - - - - - -");
+                puts("BUSQUEDA DE PELICULAS POR TITULO O PALABRA CLAVE");
+                puts("\nIntroduce el titulo o palabra clave: ");
+                scanf(" %s", keyWord);
+                buscarTitulo(Catalogo, keyWord);
                 break;
             case 'F':
                 verUnaPelicula(Catalogo,Historial);
@@ -525,6 +542,123 @@ void ordenaPorCalif(Nodo **Catalogo) {
         printf("----------------------------------------\n");
         temp = temp->sgt;
     }
+    puts("\nIngrese cualquier tecla para MENU PRINCIPAL");
+    pausa();
+    limpiarBuffer();
+}
+
+// Función para buscar las peliculas a ver dado un tiempo exacto - Programación Dinámica (Inciso D)
+void xPeliculasEnXTiempo(Nodo **Catalogo, int time) {
+    if (!*Catalogo) {
+        printf("No hay peliculas en el catalogo.\n");
+        puts("\nIngrese cualquier tecla para MENU PRINCIPAL");
+        pausa();
+        limpiarBuffer();
+        return;
+    }
+
+    system("cls");
+    puts("- - - - - - - - - - - - - - -");
+    puts("X PELICULAS EN X TIEMPO");
+
+    int n = 0;
+    Nodo **arreglo = listaEnArreglo(*Catalogo, &n);
+
+    // Crear un arreglo para la programación dinámica
+    int dp[time + 1];
+    int prev[time + 1];
+    memset(dp, -1, sizeof(dp));
+    memset(prev, -1, sizeof(prev));
+    dp[0] = 0;  // Caso base: tiempo 0 siempre es alcanzable
+
+    // Llenar la tabla de DP
+    for (int i = 0; i < n; i++) {
+        for (int j = time; j >= arreglo[i]->pelicula.duracion; j--) {
+            if (dp[j - arreglo[i]->pelicula.duracion] != -1) {
+                dp[j] = i; // Guardar el índice de la película usada
+                prev[j] = j - arreglo[i]->pelicula.duracion;
+            }
+        }
+    }
+
+    // Si no es posible alcanzar exactamente el tiempo deseado
+    if (dp[time] == -1) {
+        printf("No es posible encontrar peliculas que sumen %d minutos exactos.\n", time);
+        free(arreglo);
+        puts("\nIngrese cualquier tecla para MENU PRINCIPAL");
+        pausa();
+        limpiarBuffer();
+        return;
+    }
+
+    // Reconstruir la solución
+    printf("Peliculas para ver en un tiempo exacto de %d minutos:\n\n", time);
+    int w = time;
+    int cont = 1;
+    while (w > 0) {
+        int i = dp[w];
+        printf("%d) Titulo: %s\n", cont, arreglo[i]->pelicula.titulo);
+        printf("   Duracion: %d minutos\n", arreglo[i]->pelicula.duracion);
+        printf("---------------------------\n");
+        w = prev[w];
+        cont++;
+    }
+
+    free(arreglo);
+    puts("\nIngrese cualquier tecla para MENU PRINCIPAL");
+    pausa();
+    limpiarBuffer();
+}
+
+// Funciones para buscar una película por titulo o palabra clave - String Matching (Inciso E)
+int stringMatching(char *t, char *p) {
+    int n = strlen(t);
+    int m = strlen(p);
+
+    for (int i = 0; i <= n - m; i++) {
+      int j = 0;
+      while (j < m && tolower(t[i + j]) == tolower(p[j])) {
+        j++;
+      }
+      if (j == m)
+        return i;
+    }
+    return -1;
+}
+
+void buscarTitulo(Nodo **Catalogo, char *keyWord) {
+    if (!*Catalogo) {
+        printf("No hay peliculas en el catalogo.\n");
+        puts("\nIngrese cualquier tecla para MENU PRINCIPAL");
+        pausa();
+        limpiarBuffer();
+        return;
+    }
+
+    int found = 0, n = 0;
+    Nodo **arreglo = listaEnArreglo(*Catalogo, &n);
+
+    system("cls");
+    puts("- - - - - - - - - - - - - - -");
+    puts("BUSQUEDA DE PELICULAS POR TITULO");
+    printf("Palabra clave: '%s'\n\n", keyWord);
+
+    for (int i = 0; i < n; i++) {
+        if (stringMatching(arreglo[i]->pelicula.titulo, keyWord) != -1) {
+            found = 1;
+            printf("ID: %d\n", arreglo[i]->pelicula.id);
+            printf("Titulo: %s\n", arreglo[i]->pelicula.titulo);
+            printf("Calificacion: %d\n", arreglo[i]->pelicula.calif);
+            printf("Genero: %s\n", arreglo[i]->pelicula.genero);
+            printf("Duracion: %d minutos\n", arreglo[i]->pelicula.duracion);
+            printf("----------------------------------------\n");
+        }
+    }
+
+    if (!found) {
+        printf("No se encontraron peliculas con la palabra clave '%s'.\n", keyWord);
+    }
+    free(arreglo);
     puts("\nIngrese cualquier tecla para MENU PRINCIPAL");
     pausa();
     limpiarBuffer();
