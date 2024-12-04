@@ -493,11 +493,10 @@ void topPopulares(Nodo** Catalogo) {
     limpiarBuffer();
 }
 
-// Funcion para ordenar películas por calificación - CountingSort O(n+k) (Inciso C)
 void ordenaPorCalif(Nodo **Catalogo) {
     system("cls");
     puts("- - - - - - - - - - - - - - -");
-    puts("ORDEN POR CALIFICACION");
+    puts("ORDEN POR CALIFICACION (MAYOR A MENOR)");
 
     if (!Catalogo || !*Catalogo) {
         printf("No hay peliculas en el catalogo.\n");
@@ -507,24 +506,24 @@ void ordenaPorCalif(Nodo **Catalogo) {
         return;
     }
 
-    int max_calificacion = 5; 
-    int count[max_calificacion + 1]; 
+    int max_calificacion = 5; // Máxima calificación esperada
+    int count[max_calificacion + 1]; // Contador para cada calificación
     memset(count, 0, sizeof(count));
 
-    // Primer recorrido: Contar las calificaciones
+    // Contar la cantidad de nodos por calificación
     Nodo *temp = *Catalogo;
     while (temp != NULL) {
-        count[temp->pelicula.calif]++;  // Contamos las calificaciones
+        count[temp->pelicula.calif]++;
         temp = temp->sgt;
     }
 
-    // Acumular los conteos
-    for (int i = 1; i <= max_calificacion; i++) {
-        count[i] += count[i - 1];
+    // Acumular los conteos de mayor a menor
+    for (int i = max_calificacion - 1; i >= 0; i--) {
+        count[i] += count[i + 1];
     }
 
-    // Crear un arreglo auxiliar (ya que sabemos cuántos nodos vamos a tener)
-    int total_nodos = count[max_calificacion];
+    // Crear un arreglo auxiliar para guardar los nodos ordenados
+    int total_nodos = count[0];
     Nodo **output = (Nodo **)malloc(total_nodos * sizeof(Nodo *));
     if (!output) {
         printf("Error al asignar memoria.\n");
@@ -534,16 +533,16 @@ void ordenaPorCalif(Nodo **Catalogo) {
         return;
     }
 
-    // Segundo recorrido: Llenar el arreglo auxiliar
+    // Segundo recorrido: Colocar los nodos en el arreglo auxiliar
     temp = *Catalogo;
     while (temp != NULL) {
         int calif = temp->pelicula.calif;
-        output[count[calif] - 1] = temp;  // Colocamos el nodo en la posición correcta
+        output[count[calif] - 1] = temp; // Colocar el nodo en la posición correcta
         count[calif]--;
         temp = temp->sgt;
     }
 
-    // Reconstruir la lista enlazada desde el arreglo
+    // Reconstruir la lista enlazada desde el arreglo auxiliar
     *Catalogo = output[0];
     Nodo *current = *Catalogo;
     for (int i = 1; i < total_nodos; i++) {
@@ -551,8 +550,10 @@ void ordenaPorCalif(Nodo **Catalogo) {
         current = current->sgt;
     }
     current->sgt = NULL;
+
     free(output);
 
+    // Mostrar las películas ordenadas
     printf("Peliculas ordenadas por calificacion:\n");
     temp = *Catalogo;
     while (temp != NULL) {
@@ -562,10 +563,12 @@ void ordenaPorCalif(Nodo **Catalogo) {
         printf("----------------------------------------\n");
         temp = temp->sgt;
     }
+
     puts("\nIngrese cualquier tecla para MENU PRINCIPAL");
     pausa();
     limpiarBuffer();
 }
+
 
 // Función para buscar las peliculas a ver dado un tiempo exacto - Programación Dinámica (Inciso D)
 void xPeliculasEnXTiempo(Nodo **Catalogo, int time) {
