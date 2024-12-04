@@ -19,6 +19,11 @@ typedef struct nodo
     struct nodo *sgt;
 } Nodo;
 
+typedef struct lista {
+    Nodo *inicio;
+    Nodo *fin;
+} Lista;
+
 void pausa();
 void menu(Nodo **Catalogo, Nodo **Historial);
 
@@ -51,6 +56,16 @@ int eliminarNodo(Nodo **Lista, int id);
 void liberarLista(Nodo **Lista);
 
 int count = 0;
+
+// Inicialización de la lista
+Lista* crearLista() {
+    Lista *nuevaLista = (Lista *)malloc(sizeof(Lista));
+    if (nuevaLista) {
+        nuevaLista->inicio = NULL;
+        nuevaLista->fin = NULL;
+    }
+    return nuevaLista;
+}
 
 int main(int argc, char const *argv[])
 {
@@ -172,7 +187,6 @@ Nodo *crearNodo(int count)
 // Insertar un nodo al final de la lista - Registro con complejidad O(1)
 void insertarNodo(Nodo **Lista, Nodo *peliculaSeleccionada)
 {
-
     Nodo *newNodo = (Nodo *)malloc(sizeof(Nodo));
     if (!newNodo)
         return;
