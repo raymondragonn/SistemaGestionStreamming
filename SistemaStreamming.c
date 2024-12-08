@@ -15,14 +15,10 @@ struct elemento
 };
 typedef struct nodo
 {
-    struct elemento pelicula;
+    struct nodo *inicio;
+    struct nodo *fin;   struct elemento pelicula;
     struct nodo *sgt;
 } Nodo;
-
-typedef struct lista {
-    Nodo *inicio;
-    Nodo *fin;
-} Lista;
 
 void pausa();
 void menu(Nodo **Catalogo, Nodo **Historial);
@@ -58,8 +54,8 @@ void liberarLista(Nodo **Lista);
 int count = 0;
 
 // Inicialización de la lista
-Lista* crearLista() {
-    Lista *nuevaLista = (Lista *)malloc(sizeof(Lista));
+Nodo* crearLista() {
+    Nodo *nuevaLista = (Nodo *)malloc(sizeof(Nodo));
     if (nuevaLista) {
         nuevaLista->inicio = NULL;
         nuevaLista->fin = NULL;
@@ -184,26 +180,27 @@ Nodo *crearNodo(int count)
     return nodo;
 }
 
-// Insertar un nodo al final de la lista - Registro con complejidad O(1)
-void insertarNodo(Nodo **Lista, Nodo *peliculaSeleccionada)
-{
+// Insertar un nodo al final de la lista con complejidad O(1)
+void insertarNodo(Nodo **Lista, Nodo *peliculaSeleccionada) {
     Nodo *newNodo = (Nodo *)malloc(sizeof(Nodo));
-    if (!newNodo)
+    if (!newNodo) {
+        puts("Error al asignar memoria");
         return;
+    }
 
     newNodo->pelicula = peliculaSeleccionada->pelicula;
-    newNodo->sgt = NULL; 
+    newNodo->sgt = NULL;
 
-    if (*Lista == NULL){
-        *Lista = newNodo;
-    }
-    else{
-        // recorremos la lista hasta el último nodo
-        Nodo *temp = *Lista;
-        while (temp->sgt != NULL){
-            temp = temp->sgt;
-        }
-        temp->sgt = newNodo;
+    if (*Lista == NULL) {
+        // Si la lista está vacía
+        *Lista = newNodo; // Actualizar el inicio de la lista
+        newNodo->inicio = newNodo; // El nuevo nodo es el inicio
+        newNodo->fin = newNodo;    // El nuevo nodo también es el fin
+    } else {
+        // Si la lista no está vacía, navegar al final
+        Nodo *fin = (*Lista)->fin;
+        fin->sgt = newNodo; // Agregar el nuevo nodo
+        (*Lista)->fin = newNodo; // Actualizar el puntero fin
     }
 }
 
