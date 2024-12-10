@@ -16,7 +16,8 @@ struct elemento
 typedef struct nodo
 {
     struct nodo *inicio;
-    struct nodo *fin;   struct elemento pelicula;
+    struct nodo *fin;   
+    struct elemento pelicula;
     struct nodo *sgt;
 } Nodo;
 
@@ -192,12 +193,10 @@ void insertarNodo(Nodo **Lista, Nodo *peliculaSeleccionada) {
     newNodo->sgt = NULL;
 
     if (*Lista == NULL) {
-        // Si la lista está vacía
         *Lista = newNodo; // Actualizar el inicio de la lista
         newNodo->inicio = newNodo; // El nuevo nodo es el inicio
         newNodo->fin = newNodo;    // El nuevo nodo también es el fin
     } else {
-        // Si la lista no está vacía, navegar al final
         Nodo *fin = (*Lista)->fin;
         fin->sgt = newNodo; // Agregar el nuevo nodo
         (*Lista)->fin = newNodo; // Actualizar el puntero fin
@@ -434,7 +433,8 @@ void swap(Nodo **a, Nodo **b) {
 }
 
 int partition(Nodo** arr, int low, int high) {
-    int pivot = arr[high]->pelicula.calif; // El pivote es la calificación del último elemento
+    int pivot = arr[high]->pelicula.calif; 
+    // El pivote es la calificación del último elemento
     int i = low - 1;
 
     for (int j = low; j < high; j++) {
@@ -566,8 +566,6 @@ void ordenaPorCalif(Nodo **Catalogo) {
     limpiarBuffer();
 }
 
-
-// Función para buscar las peliculas a ver dado un tiempo exacto - Programación Dinámica (Inciso D)
 void xPeliculasEnXTiempo(Nodo **Catalogo, int time) {
     if (!*Catalogo) {
         printf("No hay peliculas en el catalogo.\n");
@@ -593,10 +591,14 @@ void xPeliculasEnXTiempo(Nodo **Catalogo, int time) {
 
     // Llenar la tabla de DP
     for (int i = 0; i < n; i++) {
+        // Se recorre de mayor a menor para evitar que la misma película se use varias veces
         for (int j = time; j >= arreglo[i]->pelicula.duracion; j--) {
             if (dp[j - arreglo[i]->pelicula.duracion] != -1) {
-                dp[j] = i; // Guardar el índice de la película usada
-                prev[j] = j - arreglo[i]->pelicula.duracion;
+                // Solo actualizamos si el tiempo no ha sido alcanzado antes
+                if (dp[j] == -1) {
+                    dp[j] = i; // Guardar el índice de la película usada
+                    prev[j] = j - arreglo[i]->pelicula.duracion; // Guardar el tiempo previo
+                }
             }
         }
     }

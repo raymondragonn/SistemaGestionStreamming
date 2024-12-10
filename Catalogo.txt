@@ -3,13 +3,13 @@ Inception|5|Accion|148
 The Matrix|3|Suspenso|136
 Titanic|4|Romance|195
 The Hangover|1|Comedia|100
-Interstellar|5|Accion|169g
+Interstellar|5|Accion|169
 The Godfather|5|Drama|175
 Avengers: Endgame|4|Accion|181
 The Dark Knight|5|Accion|152
 Pulp Fiction|4|Crimen|154
-Toy Story|3|Animacion|81
-Forrest Gump|5|Drama|142
+Toy Story|3|Animacion|60
+Forrest Gump|5|Drama|60
 The Lion King|4|Animacion|88
 Joker|3|Drama|122
 Parasite|5|Suspenso|132
